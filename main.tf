@@ -26,11 +26,12 @@ module "project_services" {
   project_id = var.project_id
   
   activate_apis = [
-    "container.googleapis.com",    # Kubernetes Engine API
-    "sqladmin.googleapis.com",     # Cloud SQL Admin API
-    "secretmanager.googleapis.com", # Secret Manager API
-    "iam.googleapis.com",          # Identity and Access Management API
-    "compute.googleapis.com"       # Compute Engine API (required for networking)
+    "container.googleapis.com",       # Kubernetes Engine API
+    "sqladmin.googleapis.com",        # Cloud SQL Admin API
+    "secretmanager.googleapis.com",   # Secret Manager API
+    "iam.googleapis.com",             # Identity and Access Management API
+    "compute.googleapis.com",         # Compute Engine API (required for networking)
+    "servicenetworking.googleapis.com" # Service Networking API (required for private services access)
   ]
   
   disable_services_on_destroy = false
@@ -58,6 +59,9 @@ module "gke" {
   cluster_name       = var.cluster_name
   node_count         = var.node_count
   machine_type       = var.machine_type
+  disk_size_gb       = var.disk_size_gb
+  disk_type          = var.disk_type
+  image_type         = var.image_type
   network_id         = module.networking.vpc_id
   subnetwork_id      = module.networking.subnet_id
   pod_range_name     = module.networking.pod_range_name
@@ -91,7 +95,13 @@ module "sql" {
   database_name = "app-database"
   user_name    = "app-user"
 
-  depends_on = [module.project_services, module.networking, module.secret]
+  # Explicitly depend on the private VPC connection
+  depends_on = [
+    module.project_services,
+    module.networking,
+    module.secret,
+    module.networking.private_vpc_connection
+  ]
 }
 
 # RBAC Module

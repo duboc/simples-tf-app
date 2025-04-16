@@ -42,3 +42,21 @@ variable "service_range_name" {
   description = "The name of the secondary IP range for services"
   type        = string
 }
+
+variable "disk_size_gb" {
+  description = "Size of the disk attached to each node, specified in GB"
+  type        = number
+  default     = 100
+}
+
+variable "disk_type" {
+  description = "Type of the disk attached to each node"
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "image_type" {
+  description = "The image type to use for the node pool"
+  type        = string
+  default     = "COS_CONTAINERD"
+}

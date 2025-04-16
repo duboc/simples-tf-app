@@ -27,3 +27,8 @@ output "service_range_name" {
   description = "The name of the service IP range"
   value       = google_compute_subnetwork.subnet.secondary_ip_range[1].range_name
 }
+
+output "private_vpc_connection" {
+  description = "The private VPC connection for Cloud SQL"
+  value       = google_service_networking_connection.private_vpc_connection.id
+}

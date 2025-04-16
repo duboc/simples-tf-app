@@ -9,6 +9,12 @@ This repository contains a modular Terraform configuration for deploying a compr
 - Uses the terraform-google-modules/project-factory module
 - Ensures all necessary services are available before resource creation
 
+### Networking with Private Services Access
+- Creates a VPC network with custom subnets
+- Configures secondary IP ranges for GKE pods and services
+- Sets up private services access connection for Cloud SQL
+- Allocates IP range for private service connections
+
 ### GKE Cluster with Standard Configuration
 - Creates a regional GKE cluster with node pools spread across multiple zones
 - Enables Workload Identity for secure pod authentication
@@ -21,7 +27,7 @@ This repository contains a modular Terraform configuration for deploying a compr
 - Grants the GKE service account permission to access the secret using roles/secretmanager.secretAccessor
 
 ### Cloud SQL PostgreSQL Instance
-- Provisions a PostgreSQL 14 instance
+- Provisions a PostgreSQL 14 instance with private IP
 - Configures backup and maintenance windows
 - Sets up private network access for security
 - Creates a database and user with the password stored in Secret Manager
@@ -74,18 +80,18 @@ Root
   ├─► Project Services
   │      │
   │      ▼
-  ├─► Networking
-  │      │
-  │      ▼
-  ├─► GKE ─────┐
-  │             │
-  ├─► Secret ◄──┤
-  │      │      │
-  │      ▼      │
-  └─► SQL       │
-         │      │
-         ▼      │
-        RBAC ◄──┘
+  ├─► Networking ───┐
+  │      │          │
+  │      ▼          │
+  ├─► GKE ─────┐    │
+  │             │    │
+  ├─► Secret ◄──┤    │
+  │      │      │    │
+  │      ▼      │    │
+  └─► SQL ◄─────┘    │
+         │           │
+         ▼           │
+        RBAC ◄───────┘
 ```
 
 ## Prerequisites
@@ -183,6 +189,19 @@ This configuration implements several security best practices:
 - Secret Manager for sensitive data
 - RBAC for access control
 - Least privilege IAM permissions
+- Private services access for secure database connectivity
+
+## Networking Architecture
+
+The networking setup includes:
+
+1. **VPC Network**: Custom VPC network with no auto-created subnets
+2. **Custom Subnet**: Subnet with specified CIDR range
+3. **Secondary IP Ranges**: Dedicated ranges for GKE pods and services
+4. **Private Services Access**: VPC peering connection for private services
+5. **IP Allocation**: Dedicated IP range for private service connections
+
+This architecture ensures secure communication between GKE and Cloud SQL without exposing services to the public internet.
 
 ## Cleanup
 
@@ -200,4 +219,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
